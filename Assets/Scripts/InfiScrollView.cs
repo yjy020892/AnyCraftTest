@@ -4,12 +4,16 @@ using UnityEngine;
 using UnityEngine.UI;
 using System.Linq;
 using JY;
+using UnityEngine.ResourceManagement.AsyncOperations;
+using UnityEngine.AddressableAssets;
 
 namespace JY
 {
     [RequireComponent(typeof(ScrollRect))]
     public class InfiScrollView : MonoBehaviour
     {
+        public GameObject[] models;
+
         public GameObject itemObj;
 
         public int modelCnt = 0;
@@ -34,24 +38,25 @@ namespace JY
 
         private Vector2 prevScrollPos;
 
-        private Dictionary<int, Model> modelData = new Dictionary<int, Model>();
-        private Dictionary<int, Item> itemData = new Dictionary<int, Item>();
+        private Dictionary<int, ModelData> modelData = new Dictionary<int, ModelData>();
+        private Dictionary<int, ItemData> itemData = new Dictionary<int, ItemData>();
 
         private List<Item> itemList = new List<Item>();
+
+        private void Awake()
+        {
+            Init();
+        }
 
         // Start is called before the first frame update
         void Start()
         {
-            Init();
             SetContent();
         }
 
         void Init()
         {
             SetData();
-
-            scrollWidthCnt = (int)(rt.rect.width / itemWidth);
-            scrollHeightCnt = (int)(rt.rect.height / itemHeight);
 
             itemSpacing = (int)((rt.rect.width - (scrollWidthCnt * itemWidth)) / (scrollWidthCnt + 1));
 
@@ -62,26 +67,19 @@ namespace JY
             Debug.Log($"[{rt.rect.width}]scrollWidthCnt : {scrollWidthCnt}");
             Debug.Log($"[{rt.rect.height}]scrollHeightCnt : {scrollHeightCnt}");
 
-            for (int i = 0; i < totalCnt; i++)
-            {
-                Item item = Instantiate(itemObj, scrollRect.content).GetComponent<Item>();
-                item.SetData(string.Format($"{itemData[i].Name}"), itemData[i].ModelType, itemData[i].HeightCount);
-
-                setItemCount++;
-
-                itemList.Add(item);
-            }
-
-            UpdateContent();
+            StartCoroutine(CreateItem());
 
             scrollRect.onValueChanged.AddListener(OnScrollPosChanged);
         }
 
         private void SetData()
         {
+            scrollWidthCnt = (int)(rt.rect.width / itemWidth);
+            scrollHeightCnt = (int)(rt.rect.height / itemHeight);
+
             for (int i = 0; i < modelCnt; i++)
             {
-                Model model = new Model($"{i}", (ModelType)Random.Range(0, 3));
+                ModelData model = new ModelData($"{i}", (ModelType)Random.Range(0, 3));
 
                 modelData.Add(i, model);
             }
@@ -89,7 +87,7 @@ namespace JY
             int widthCnt = 0;
             for (int i = 0; i < itemCnt; i++)
             {
-                Item item = new Item($"{i}", (ModelType)Random.Range(0, 3), heightCnt);
+                ItemData item = new ItemData($"{i}", (ModelType)Random.Range(0, 3), heightCnt);
 
                 widthCnt++;
                 if (widthCnt == scrollWidthCnt)
@@ -132,6 +130,31 @@ namespace JY
             UpdateItems((scrollPos.y < prevScrollPos.y) ? 1 : -1);
 
             prevScrollPos = scrollPos;
+        }
+
+        IEnumerator CreateItem()
+        {
+            GameObject obj = null;
+
+            for (int i = 0; i < totalCnt; i++)
+            {
+                Addressables.InstantiateAsync("Assets/Prefabs/Item.prefab", scrollRect.content).Completed += handle => {
+                    obj = handle.Result;
+                };
+
+                yield return new WaitUntil(() => obj != null);
+
+                Item item = obj.GetComponent<Item>();
+                //Item item = Instantiate(itemObj, scrollRect.content).GetComponent<Item>();
+                item.SetData(string.Format($"{itemData[i].Name}"), itemData[i].ModelType, itemData[i].HeightCount);
+                item.btn.onClick.AddListener(() => OnClickChangeModel(item));
+
+                setItemCount++;
+
+                itemList.Add(item);
+            }
+
+            UpdateContent();
         }
 
         private void UpdateItems(int scrollDirection)
@@ -185,6 +208,17 @@ namespace JY
                     }
                 }
             }
+        }
+
+        private void OnClickChangeModel(Item item)
+        {
+            //Debug.Log($"Name : {item.Name}, Type : {item.ModelType}");
+            foreach(var model in models)
+            {
+                model.SetActive(false);
+            }
+
+            models[(int)item.ModelType].SetActive(true);
         }
     }
 }

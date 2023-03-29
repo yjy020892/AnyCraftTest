@@ -3,15 +3,33 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using JY;
+using System;
 
 namespace JY
 {
+    public class ItemData
+    {
+        public string Name = string.Empty;
+        public ModelType ModelType;
+        public int HeightCount = 0;
+
+        public ItemData(string s, ModelType type, int heightCnt)
+        {
+            if (!string.IsNullOrWhiteSpace(s))
+                Name = s;
+
+            ModelType = type;
+            HeightCount = heightCnt;
+        }
+    }
+
     public class Item : MonoBehaviour
     {
         public RectTransform rt;
         public Text nameText;
+        public Button btn;
 
-        private string name;
+        private string _name;
         public string Name {
             get { return name; }
             set { name = value; }
@@ -29,17 +47,6 @@ namespace JY
             set { heightCount = value; }
         }
 
-        private ScrollRect m_scrollRect = null;
-
-        public Item(string s, ModelType type, int heightCnt)
-        {
-            if (!string.IsNullOrWhiteSpace(s))
-                name = s;
-
-            modelType = type;
-            heightCount = heightCnt;
-        }
-
         public void SetData(string s, ModelType type, int heightCnt = 0)
         {
             name = s;
@@ -48,14 +55,11 @@ namespace JY
             if (!heightCnt.Equals(0))
                 heightCount = heightCnt;
 
-            nameText.text = name;
+            nameText.text = $"{name}_{modelType}";
         }
 
         public void SetPosition(bool isLocal, float x, float y)
         {
-            if (object.ReferenceEquals(null, rt))
-                rt = GetComponent<RectTransform>();
-
             if (isLocal)
                 rt.localPosition = new Vector3(x, y);
             else

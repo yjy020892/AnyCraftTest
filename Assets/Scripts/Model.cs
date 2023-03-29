@@ -3,25 +3,65 @@ using System.Collections.Generic;
 using UnityEngine;
 using JY;
 
-public class Model
+namespace JY
 {
-    private string name;
-    public string Name {
-        get { return name; }
-        set { name = value; }
-    }
-
-    private ModelType modelType;
-    public ModelType ModelType {
-        get { return modelType; }
-        set { modelType = value; }
-    }
-
-    public Model(string s, ModelType type)
+    public class ModelData
     {
-        if (!string.IsNullOrWhiteSpace(s))
-            name = s;
+        public string Name = string.Empty;
+        public ModelType ModelType;
 
-        modelType = type;
+        public ModelData(string s, ModelType type)
+        {
+            if (!string.IsNullOrWhiteSpace(s))
+                Name = s;
+
+            ModelType = type;
+        }
+    }
+    public class Model : MonoBehaviour
+    {
+        Animator anim;
+
+        float blendTreeValue = 0.0f;
+
+        bool b_Plus = true;
+
+        private string name;
+        public string Name {
+            get { return name; }
+            set { name = value; }
+        }
+
+        private ModelType modelType;
+        public ModelType ModelType {
+            get { return modelType; }
+            set { modelType = value; }
+        }
+
+        private void Start()
+        {
+            anim = GetComponent<Animator>();
+        }
+
+        private void Update()
+        {
+            if(b_Plus)
+                blendTreeValue += (Time.deltaTime * 0.1f);
+            else
+                blendTreeValue -= (Time.deltaTime * 0.1f);
+
+            if (blendTreeValue >= 1.0f)
+            {
+                blendTreeValue = 1.0f;
+                b_Plus = false;
+            }
+            else if (blendTreeValue <= 0)
+            {
+                blendTreeValue = 0.0f;
+                b_Plus = true;
+            }
+
+            anim.SetFloat("3DMove", blendTreeValue);
+        }
     }
 }
