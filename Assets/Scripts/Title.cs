@@ -12,20 +12,19 @@ public class Title : MonoBehaviour
     {
         Application.targetFrameRate = 60;
     }
-
+    
     // Update is called once per frame
     void Update()
     {
         timer += Time.deltaTime;
 
-        if (timer > 3.0f)
+        if (timer > 2.0f)
         {
             if (!b_Start)
             {
                 StartCoroutine(Loading.LoadScene("Lobby"));
                 b_Start = true;
             }
-                
         }
     }
 }

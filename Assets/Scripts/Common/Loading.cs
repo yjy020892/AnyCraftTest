@@ -6,6 +6,11 @@ using UnityEngine;
 
 public class Loading : MonoBehaviour
 {
+    /// <summary>
+    /// 비동기 씬 로드
+    /// </summary>
+    /// <param name="sceneName"></param>
+    /// <returns></returns>
     public static IEnumerator LoadScene(string sceneName)
     {
         Debug.Log($"sceneName : {sceneName}");
@@ -15,8 +20,6 @@ public class Loading : MonoBehaviour
 
         while (!asyncOperation.isDone)
         {
-            //progressTxt.text = $"{asyncOperation.progress}%";
-
             if (asyncOperation.progress >= 0.9f)
             {
                 asyncOperation.allowSceneActivation = true;

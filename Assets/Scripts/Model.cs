@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using JY;
 
 namespace JY
 {
@@ -26,6 +25,7 @@ namespace JY
 
         bool b_Plus = true;
 
+        #region Property
         private string name;
         public string Name {
             get { return name; }
@@ -37,6 +37,7 @@ namespace JY
             get { return modelType; }
             set { modelType = value; }
         }
+        #endregion
 
         private void Start()
         {
@@ -46,9 +47,9 @@ namespace JY
         private void Update()
         {
             if(b_Plus)
-                blendTreeValue += (Time.deltaTime * 0.1f);
+                blendTreeValue += (Time.deltaTime * 0.2f);
             else
-                blendTreeValue -= (Time.deltaTime * 0.1f);
+                blendTreeValue -= (Time.deltaTime * 0.2f);
 
             if (blendTreeValue >= 1.0f)
             {
