@@ -20,7 +20,8 @@ MonoBehaviour:
   - m_GUID: 1768ace9fd8929243b0abc681a588ed4
     m_Address: Assets/Prefabs/Item.prefab
     m_ReadOnly: 0
-    m_SerializedLabels: []
+    m_SerializedLabels:
+    - ModelUI
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 735bba1754db9ad41a0d9d01556cb7f8, type: 2}
   m_SchemaSet:

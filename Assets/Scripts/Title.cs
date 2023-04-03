@@ -2,28 +2,31 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Title : MonoBehaviour
+namespace JY
 {
-    float timer = 0.0f;
-
-    bool b_Start = false;
-
-    private void Start()
+    public class Title : MonoBehaviour
     {
-        Application.targetFrameRate = 60;
-    }
-    
-    // Update is called once per frame
-    void Update()
-    {
-        timer += Time.deltaTime;
+        float timer = 0.0f;
 
-        if (timer > 2.0f)
+        bool b_Start = false;
+
+        private void Start()
         {
-            if (!b_Start)
+            Application.targetFrameRate = 60;
+        }
+
+        // Update is called once per frame
+        void Update()
+        {
+            timer += Time.deltaTime;
+
+            if (timer > 2.0f)
             {
-                StartCoroutine(Loading.LoadScene("Lobby"));
-                b_Start = true;
+                if (!b_Start)
+                {
+                    Loading.LoadScene("Lobby");
+                    b_Start = true;
+                }
             }
         }
     }

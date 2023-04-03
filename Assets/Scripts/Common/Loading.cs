@@ -4,28 +4,54 @@ using UnityEngine.UI;
 using UnityEngine.SceneManagement;
 using UnityEngine;
 
-public class Loading : MonoBehaviour
+namespace JY
 {
-    /// <summary>
-    /// 비동기 씬 로드
-    /// </summary>
-    /// <param name="sceneName"></param>
-    /// <returns></returns>
-    public static IEnumerator LoadScene(string sceneName)
+    public class Loading : MonoBehaviour
     {
-        Debug.Log($"sceneName : {sceneName}");
-        AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
+        static string nextScene;
 
-        asyncOperation.allowSceneActivation = false;
+        bool isAsync = false;
 
-        while (!asyncOperation.isDone)
+        public static void LoadScene(string sceneName)
         {
-            if (asyncOperation.progress >= 0.9f)
-            {
-                asyncOperation.allowSceneActivation = true;
-            }
+            nextScene = sceneName;
+            SceneManager.LoadScene("Loading");
+        }
 
-            yield return null;
+        private void Start()
+        {
+            StartCoroutine(LoadSceneAsync(nextScene));
+        }
+
+        /// <summary>
+        /// 비동기 씬 로드
+        /// 미리 어드레서블 로드
+        /// </summary>
+        /// <param name="sceneName"></param>
+        /// <returns></returns>
+        public IEnumerator LoadSceneAsync(string sceneName)
+        {
+            Debug.Log($"sceneName : {sceneName}");
+            AsyncOperation asyncOperation = SceneManager.LoadSceneAsync(sceneName);
+
+            asyncOperation.allowSceneActivation = false;
+
+            while (!asyncOperation.isDone)
+            {
+                if (asyncOperation.progress >= 0.9f)
+                {
+                    StartCoroutine(AddressableManager.GetInstance.AddressablesAsync("ModelUI", (x) => {
+                        isAsync = x;
+                    }));
+
+                    yield return new WaitUntil(() => isAsync);
+
+                    if(AddressableManager.GetInstance.addressablesItemObj != null)
+                        asyncOperation.allowSceneActivation = true;
+                }
+
+                yield return null;
+            }
         }
     }
 }

@@ -10,7 +10,6 @@ namespace JY
     [RequireComponent(typeof(ScrollRect))]
     public class InfiScrollView : MonoBehaviour
     {
-        public GameObject loadingCanvas; // 어드레서블 오브젝트 생성 전까지 로딩
         public GameObject[] models;
 
         //public GameObject itemObj;
@@ -48,15 +47,13 @@ namespace JY
         }
 
         // Start is called before the first frame update
-        void Start()
+        private void Start()
         {
             SetContent();
         }
 
         void Init()
         {
-            loadingCanvas.SetActive(true);
-
             scrollWidthCnt = (int)(rt.rect.width / itemWidth);
             scrollHeightCnt = (int)(rt.rect.height / itemHeight);
 
@@ -73,7 +70,8 @@ namespace JY
 
             SetData();
 
-            StartCoroutine(CreateItem());
+            //StartCoroutine(CreateItem());
+            CreateItem();
 
             scrollRect.onValueChanged.AddListener(OnScrollPosChanged);
         }
@@ -165,20 +163,22 @@ namespace JY
         /// 생성 완료되면 로딩창 제거
         /// </summary>
         /// <returns></returns>
-        IEnumerator CreateItem()
+        //IEnumerator CreateItem()
+        private void CreateItem()
         {
-            GameObject obj = null;
+            //GameObject obj = null;
 
             for (int i = 0; i < totalCnt; i++)
             {
-                Addressables.InstantiateAsync("Assets/Prefabs/Item.prefab", scrollRect.content).Completed += handle => {
-                    obj = handle.Result;
-                };
+                //Addressables.InstantiateAsync("Assets/Prefabs/Item.prefab", scrollRect.content).Completed += handle => {
+                //    obj = handle.Result;
+                //};
 
-                yield return new WaitUntil(() => obj != null);
+                //yield return new WaitUntil(() => obj != null);
 
-                Item item = obj.GetComponent<Item>();
-                //Item item = Instantiate(itemObj, scrollRect.content).GetComponent<Item>();
+                //Item item = obj.GetComponent<Item>();
+
+                Item item = Instantiate(AddressableManager.GetInstance.addressablesItemObj, scrollRect.content).GetComponent<Item>();
                 item.SetData(string.Format($"{itemData[i].Name}"), itemData[i].ModelType, itemData[i].HeightCount, itemData[i].ItemPos, itemData[i].IsPosition);
                 item.SetScale(itemWidth, itemHeight);
                 item.btn.onClick.AddListener(() => OnClickChangeModel(item));
@@ -188,7 +188,8 @@ namespace JY
                 itemList.Add(item);
             }
 
-            loadingCanvas.SetActive(false);
+            Addressables.Release(AddressableManager.GetInstance.ItemHandle); // 메모리에서 로드한 어드레서블 Model UI 내리기
+
             UpdateContent();
         }
 
