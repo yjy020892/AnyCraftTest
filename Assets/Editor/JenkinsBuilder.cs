@@ -12,14 +12,32 @@ namespace JY.Jenkins
     /// </summary>
     public class JenkinsBuilder : MonoBehaviour
     {
-        [MenuItem("Jenkins/Build AOS")]
-        public static void JenkinsBuild_AOS()
+        /// <summary>
+        /// 젠킨스 CommandLine으로 Argument 넘겨줄수 있게
+        /// </summary>
+        public static void BuildJenkins()
+        {
+            string pathName = GetArgument("-pathName"); // 예시로 그냥 넣음
+
+            JenkinsBuild_AOS(pathName);
+        }
+
+        private static void JenkinsBuild_AOS(string pathName = "")
         {
             string[] SCENES = FindEnabledEditorScenes();
 
             BuildPlayerOptions buildPlayerOptions = new BuildPlayerOptions();
             buildPlayerOptions.scenes = SCENES;
-            buildPlayerOptions.locationPathName = $"Build/{PlayerSettings.productName}_{PlayerSettings.bundleVersion}_{DateTime.Now.ToString("yyyyMMdd_hhmm")}.apk";
+
+            if (string.IsNullOrWhiteSpace(pathName))
+            {
+                buildPlayerOptions.locationPathName = $"Build/{PlayerSettings.productName}_{PlayerSettings.bundleVersion}_{DateTime.Now.ToString("yyyyMMdd_hhmm")}.apk";
+            }
+            else
+            {
+                buildPlayerOptions.locationPathName = $"Build/{pathName}_{PlayerSettings.bundleVersion}_{DateTime.Now.ToString("yyyyMMdd_hhmm")}.apk";
+            }
+            
             buildPlayerOptions.target = BuildTarget.Android;
             buildPlayerOptions.options = BuildOptions.None;
 
@@ -49,6 +67,18 @@ namespace JY.Jenkins
             }
 
             return editorScenes.ToArray();
+        }
+
+        private static string GetArgument(string value)
+        {
+            var arguments = System.Environment.GetCommandLineArgs();
+            for (int i = 0; i < arguments.Length; i++)
+            {
+                if (arguments[i] == value && arguments.Length > i + 1)
+                    return arguments[i + 1];
+            }
+
+            return null;
         }
     }
 }

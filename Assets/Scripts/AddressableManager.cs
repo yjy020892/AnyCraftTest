@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.ResourceManagement.AsyncOperations;
@@ -14,7 +15,7 @@ namespace JY
 
         public AsyncOperationHandle ItemHandle;
 
-        public GameObject addressablesItemObj;
+        public GameObject addressablesItemObj; // 어드레서블로 불러온 Model UI 오브젝트 저장
 
         public static AddressableManager GetInstance {
             get {
@@ -45,10 +46,9 @@ namespace JY
                 ItemHandle = obj;
                 addressablesItemObj = obj.Result;
             };
-
             yield return new WaitUntil(() => isDone);
 
-            callback(true);
+            callback(isDone);
         }
     }
 }

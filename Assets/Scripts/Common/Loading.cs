@@ -46,7 +46,7 @@ namespace JY
 
                     yield return new WaitUntil(() => isAsync);
 
-                    if(AddressableManager.GetInstance.addressablesItemObj != null)
+                    if (AddressableManager.GetInstance.addressablesItemObj != null)
                         asyncOperation.allowSceneActivation = true;
                 }
 
