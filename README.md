@@ -1,4 +1,4 @@
-# AnyCraftTest
+# ScrollView
 
 Lobby ScrollView 컴포넌트로 붙어있는 InfiScrollView에서<br/>
 ItemCnt로 ModelList UI 총 개수 조절<br/>
